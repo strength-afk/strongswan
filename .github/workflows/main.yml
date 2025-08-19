@@ -34,7 +34,7 @@ jobs:
         EOF
         
         export NDK_PROJECT_PATH=$(pwd)
-        ndk-build APP_ABI=arm64-v8a
+        ndk-build APP_ABI=arm64-v8a,armeabi-v7a,x86,x86_64
         
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
