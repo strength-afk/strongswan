@@ -1,0 +1,45 @@
+name: Android Build
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Android NDK
+      uses: android-actions/setup-android@v2
+      with:
+        ndk-version: '25.2.9519653'
+    
+    - name: Build strongSwan libraries
+      run: |
+        export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/25.2.9519653
+        export PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
+        
+        mkdir -p jni
+        cp Android.mk jni/
+        cp -r src jni/
+        cp Android.common.mk.in jni/Android.common.mk
+        
+        cat > jni/Application.mk << EOF
+        APP_ABI := arm64-v8a
+        APP_PLATFORM := android-21
+        APP_STL := c++_static
+        APP_CPPFLAGS += -std=c++11
+        APP_ALLOW_MISSING_DEPS := true
+        EOF
+        
+        export NDK_PROJECT_PATH=$(pwd)
+        ndk-build APP_ABI=arm64-v8a
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: strongswan-libs
+        path: libs/
