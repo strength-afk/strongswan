@@ -14,8 +14,6 @@ jobs:
     
     - name: Set up Android NDK
       uses: android-actions/setup-android@v2
-      with:
-        ndk-version: '25.2.9519653'
     
     - name: Build strongSwan libraries
       run: |
